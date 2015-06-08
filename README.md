@@ -1,2 +1,2 @@
-# serial_plotter
+# gui_plotter
 PyQT based GUI Utility to parse and plot data from serial port or file
