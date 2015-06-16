@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-from plot_window import MainWindow, DataCurve
-from PyQt4 import Qt, QtGui
+from plot_window import MainWindow
+from PyQt4 import QtGui
 
 import serial
 from threaded_reader import ThreadedReader
@@ -43,7 +43,7 @@ window = MainWindow()
 window.dataSource = source
 window.addCurves(curves)
 window.maxValue = 1     # default scale
-window.MAX_LINES = 1000 # maximum points to store, can be None if no limit
+window.MAX_LINES = 100 # maximum points to store, can be None if no limit
 window.show()
 
 app.exec_()

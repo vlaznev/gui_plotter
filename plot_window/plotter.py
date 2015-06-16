@@ -31,9 +31,6 @@ class Plotter(QtGui.QWidget):
         self._background = color
         self.repaint()
 
-    def mouseMoveEvent(self, evt):
-        self.repaint()
-
     def paintEvent(self, event):
         bitmap = QtGui.QPixmap(self.size())
         self.plot(bitmap)
@@ -52,6 +49,7 @@ class Plotter(QtGui.QWidget):
         mousePos = self.mapFromGlobal(QtGui.QCursor.pos())
         mouse = (mousePos.x(), mousePos.y())
         nearest = None
+        distanceToNearest = None
 
         rect = QtCore.QRect(0, 0, width, height)
         painter.begin(paintDevice)
@@ -64,11 +62,15 @@ class Plotter(QtGui.QWidget):
                     if prev is None:
                         prev = coords
                         continue
-                    if coords[0] is not None and coords[1] is not None:
-                        if not nearest or self.distanceSqr(nearest, mouse) > self.distanceSqr(coords, mouse):
+                    if coords and coords[0] is not None and coords[1] is not None:
+                        distance =  self.distanceSqr(coords, mouse)
+                        if not nearest or distanceToNearest > distance:
                             nearest = tuple(coords)
+                            distanceToNearest = distance
                         if prev[0] is not None and prev[1] is not None:
                             painter.drawLine(prev[0], prev[1], coords[0], coords[1])
+                    elif prev and prev[0] is not None and prev[1] is not None:
+                            painter.drawPoint(prev[0], prev[1])
                     prev = coords
 
         if nearest and self.distanceSqr(nearest, mouse) < 9:

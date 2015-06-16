@@ -126,19 +126,21 @@ class ParserListItem(QtGui.QListWidgetItem):
     def setDataCurve(self, curve):
         self._curve = curve
         self.setText(str(curve))
-        self.setData(Qt.Qt.DecorationRole, curve.color())
+        self.setData(Qt.Qt.DecorationRole, curve.qtColor())
 
 class ParserListItemPainter(QtGui.QStyledItemDelegate):
     def __init__(self, parent=None):
         super(ParserListItemPainter, self).__init__(parent)
 
-    def paint(self, painter, option, index):
+    def paint(self, painter, option, item):
         if option.state & QtGui.QStyle.State_Selected:
             painter.fillRect(option.rect, option.palette.color(QtGui.QPalette.Highlight))
 
-        text = str(index)
-        color = index.color
+        text = str(item)
+        color = item.color
         r = option.rect.adjusted(5,0,0,-5)
+        if not isinstance(color, QtGui.QColor):
+            color = QtGui.QColor(color)
         painter.fillRect(r, color)
 
     def sizeHint(self, option, index):

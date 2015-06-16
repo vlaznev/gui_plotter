@@ -41,7 +41,7 @@ class MainWindow(QtGui.QDialog):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.MAX_LINES = 1000
+        self.MAX_LINES = 100
         self.dataSource = emptyGenerator()
 
         self.input = []
@@ -74,7 +74,7 @@ class MainWindow(QtGui.QDialog):
         self.leftPanel.setStretch(0, 0)
         self.leftPanel.addWidget(self.plot)
         self.leftPanel.setStretch(1, 1)
-        self.leftPanel.addWidget(QtGui.QLabel("Input graph (select range to detail with right-click):"))
+        self.leftPanel.addWidget(QtGui.QLabel("Input graph (left-click: select range, right click: move range):"))
         self.leftPanel.setStretch(2, 0)
         self.leftPanel.addWidget(self.plotScroller)
         self.leftPanel.setStretch(3, 1)
@@ -117,13 +117,13 @@ class MainWindow(QtGui.QDialog):
         return (screenX, screenY, x, y)
 
     def mainPlotGetter(self, curveId, width, height):
-        if curveId not in self.curve or self.plotScroller.selectionWidth == 0:
+        if curveId not in self.curve or self.plotScroller.selection.width() == 0:
             return emptyGenerator()
         curve = self.curve[curveId]
         data = curve.data
         offset = curve.offset
-        minIndex = self.plotScroller.selectionPos
-        maxIndex = self.plotScroller.selectionPos + self.plotScroller.selectionWidth
+        minIndex = self.plotScroller.selection.min()
+        maxIndex = self.plotScroller.selection.max()
 
         if maxIndex < offset:
             return emptyGenerator()
@@ -157,8 +157,8 @@ class MainWindow(QtGui.QDialog):
         return itertools.imap(lambda xy: self.buildTuple(xy[0], xy[1], step, scale, height), coords)
 
     def onScrollerChanged(self):
-        minIndex = self.plotScroller.selectionPos
-        maxIndex = self.plotScroller.selectionPos + self.plotScroller.selectionWidth
+        minIndex = self.plotScroller.selection.min()
+        maxIndex = self.plotScroller.selection.max()
         self.oldSelection = (minIndex, maxIndex)
         self.plot.replot()
 
@@ -218,7 +218,7 @@ class MainWindow(QtGui.QDialog):
                     curve.offset = 0
                     del curve.data[0:toCut]
             if self.plotScroller.selectionAnchor != Anchor.Right:
-                self.plotScroller.setSelectionPos(self.plotScroller.selectionPos - delta)
+                self.plotScroller.moveSelectionBy(-delta)
             self.plot.replot()
         self.plotScroller.setMaxValue(self.totalLines)
         self.plot.setUpdatesEnabled(updatesEnabled)
